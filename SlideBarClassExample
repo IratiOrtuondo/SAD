@@ -183,6 +183,23 @@ class ConsoleBar implements Observer {
     	System.out.print("] " + value + "/" + model.max + " "); // Show the value and max
     	System.out.flush(); // Ensure everything is printed
 	}
+
+//private void display() { //METODE DISPLAY PER ENSENYAR EL PERCENTATGE
+   // int value = model.get();
+   // int percentage = (int) ((double) value / model.max * 100); // Calculate percentage of the value relative to max
+
+    // Clear the line
+   // System.out.print("\r"); // Carriage return to overwrite the current line
+    //System.out.print("[");
+
+    // Display percentage
+   // System.out.printf("%3d%%", percentage); // Show the percentage (padded to ensure it aligns properly)
+    //System.out.print("] " + value + "/" + model.max+ “ ”); // Show the current value and max value
+
+   // System.out.flush(); // Ensure everything is printed
+}
+
+
 }
 
 
