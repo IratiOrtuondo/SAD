@@ -197,7 +197,7 @@ class ConsoleBar implements Observer {
     //System.out.print("] " + value + "/" + model.max+ “ ”); // Show the current value and max value
 
    // System.out.flush(); // Ensure everything is printed
-}
+//}
 
 
 }
