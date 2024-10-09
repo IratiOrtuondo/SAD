@@ -1,0 +1,79 @@
+import java.util.*;
+
+class ConsoleBar implements Observer {
+	static enum Opcode {
+    	INC, DEC, BELL
+	}
+
+	static class Command {
+    	Opcode op;
+
+    	Command(Opcode op) {
+        	this.op = op;
+    	}
+	}
+
+    
+	Value model;
+	static final char BLOCK = '#'; // Character to represent the filled part of the bar
+
+	ConsoleBar(Value value) {
+    	model = value;
+
+    	// get max columns (you can set a default value, e.g., 20)
+     	// Or you can use a method to calculate it dynamically
+    	display();
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+    	Command comm = (Command) arg;
+    	switch (comm.op) {
+        	case INC:
+            	display(); // Display when incremented
+            	break;
+        	case DEC:
+            	display(); // Display when decremented
+            	break;
+        	case BELL:
+            	System.out.print('\007'); // Sound a bell
+            	break;
+    	}
+	}
+
+	// Method to display the current value as a bar
+	private void display() {
+    	int value = model.get();
+    	int filledBlocks = (int) ((double) value); // Calculate filled blocks based on max value
+
+    	// Clear the line
+    	System.out.print("\r"); // Carriage return to overwrite the current line
+    	System.out.print("[");
+    	for (int i = 0; i < filledBlocks; i++) {
+        	System.out.print(BLOCK); // Print filled blocks
+    	}
+    	for (int i = filledBlocks; i < model.max; i++) {
+        	System.out.print(' '); // Print empty space
+    	}
+    	System.out.print("] " + value + "/" + model.max + " "); // Show the value and max
+    	System.out.flush(); // Ensure everything is printed
+	}
+
+//private void display() { //METODE DISPLAY PER ENSENYAR EL PERCENTATGE
+   // int value = model.get();
+   // int percentage = (int) ((double) value / model.max * 100); // Calculate percentage of the value relative to max
+
+    // Clear the line
+   // System.out.print("\r"); // Carriage return to overwrite the current line
+    //System.out.print("[");
+
+    // Display percentage
+   // System.out.printf("%3d%%", percentage); // Show the percentage (padded to ensure it aligns properly)
+    //System.out.print("] " + value + "/" + model.max+ “ ”); // Show the current value and max value
+
+   // System.out.flush(); // Ensure everything is printed
+//}
+
+
+}
+
