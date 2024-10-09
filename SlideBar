@@ -1,0 +1,77 @@
+
+
+import java.io.*;
+import static java.lang.System.in;
+
+public class SlideBar {
+
+	private static void setRaw() {
+    	// Configura el terminal en modo "raw"
+  	try {
+        	Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", "stty -echo raw </dev/tty" }).waitFor();
+    	} catch (IOException | InterruptedException e) {
+        	System.err.println("Error al establecer modo raw: " + e.getMessage());
+        	e.printStackTrace(); // Opción para depuración
+    	}
+	}
+ 
+	private static void unsetRaw() {
+    	// Restaura el terminal a modo "cooked"
+    	try {
+        	Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", "stty echo cooked </dev/tty" }).waitFor();
+    	} catch (IOException | InterruptedException e) {
+        	System.err.println("Error al regresar al modo normal: " + e.getMessage());
+        	e.printStackTrace(); // Opción para depuración
+    	}
+	}
+ 
+	static final int RIGHT = 0, LEFT = 1;
+ 
+	public static int readArrow() throws IOException {
+    	int ch;
+    	// Leer el carácter hasta que se presiona Enter
+        	ch = in.read();
+        	if (ch == 27) { // Si se detecta ESC
+            	in.read(); // Lee y descarta '['
+            	ch= in.read();
+                 	switch (ch) {
+                    	case 'C' -> {
+                        	return RIGHT; // Flecha derecha (Right Arrow)
+            	}
+                    	case 'D' -> {
+                        	return LEFT;
+            	}
+                    	}
+        	}// Flecha izquierda (Left Arrow)
+       	return ch;
+	}
+ 
+	public static void main(String[] args) throws IOException {
+    	int arrow;
+    	ConsoleBar con = null;
+    	Value value = null;
+   	 
+    	try {
+       	 
+        	value = new Value();
+        	con = new ConsoleBar(value);
+       	 
+        	setRaw();
+        	value.setMax(20); // Establecer el máximo de columnas, por ejemplo
+        	value.addObserver(con);
+       	 
+        	while ((arrow = readArrow()) != '\r') {
+            	if (arrow == RIGHT)
+                	value.inc(); // Incrementar el valor si se presiona flecha derecha
+            	else if (arrow == LEFT)
+                	value.dec(); // Decrementar el valor si se presiona flecha izquierda
+        	}
+    	} finally {
+        	unsetRaw();
+        	// Limpiar la consola o hacer limpieza necesaria
+    	}
+	}
+}
+
+
+
