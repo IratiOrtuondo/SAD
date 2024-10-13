@@ -1,0 +1,17 @@
+package MVC;
+
+public class TextView {
+    public void displayText(String text, int cursorPos) {
+        System.out.print("\r" + text + " "); // Imprime el buffer con un espacio para borrar restos
+        System.out.print("\r" + text); // Re-imprime el texto
+        moveCursor(cursorPos); // Mueve el cursor a la posición correcta
+    }
+
+    private void moveCursor(int position) {
+        System.out.print("\033[" + (position + 1) + "G"); // Mueve el cursor a la posición dada
+    }
+
+    public void displayInsertMode(boolean insertMode) {
+        System.out.println("\nModo de inserción: " + (insertMode ? "Activado" : "Desactivado"));
+    }
+}
