@@ -1,0 +1,59 @@
+package MVC;
+
+import java.io.IOException;
+
+public class TextController {
+    private TextModel model;
+    private TextView view;
+    private EditableBufferedReader reader;
+
+    public TextController(TextModel model, TextView view, EditableBufferedReader reader) {
+        this.model = model;
+        this.view = view;
+        this.reader = reader;
+    }
+
+    public void startEditing() throws IOException {
+        reader.setRaw();
+        try {
+            while (true) {
+                view.displayText(model.getText(), model.getCursorPos());
+                int key = reader.read();
+
+                if (key == 13) { // Enter, finaliza la edición
+                    break;
+                }
+
+                switch (key) {
+                    case -102: // Flecha derecha
+                        model.moveCursorRight();
+                        break;
+                    case -103: // Flecha izquierda
+                        model.moveCursorLeft();
+                        break;
+                    case -104: // Home
+                        model.moveCursorHome();
+                        break;
+                    case -105: // End
+                        model.moveCursorEnd();
+                        break;
+                    case -106: // Backspace
+                        model.deleteChar();
+                        break;
+                    case -107: // Delete
+                        model.deleteCurrentChar();
+                        break;
+                    case -108: // Insert (cambia entre modo inserción/sobreescritura)
+                        model.toggleInsertMode();
+                        view.displayInsertMode(model.isInsertMode());
+                        break;
+                    default: // Cualquier otro carácter
+                        model.insertChar((char) key);
+                        break;
+                }
+            }
+        } finally {
+            reader.unsetRaw();
+        }
+    }
+}
