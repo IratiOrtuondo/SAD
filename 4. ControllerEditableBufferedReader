@@ -1,59 +1,117 @@
-package MVC;
-
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class TextController {
     private TextModel model;
     private TextView view;
-    private EditableBufferedReader reader;
+    private BufferedReader reader;
 
-    public TextController(TextModel model, TextView view, EditableBufferedReader reader) {
+    public TextController(TextModel model, TextView view) {
         this.model = model;
         this.view = view;
-        this.reader = reader;
+        this.reader = new BufferedReader(new InputStreamReader(System.in));
     }
 
-    public void startEditing() throws IOException {
-        reader.setRaw();
+    // Método para pasar la consola a modo raw (sin buffer de línea)
+    public void setRaw() {
         try {
-            while (true) {
-                view.displayText(model.getText(), model.getCursorPos());
-                int key = reader.read();
+            Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "stty -echo raw </dev/tty"}).waitFor();
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Error al establecer modo raw: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
-                if (key == 13) { // Enter, finaliza la edición
-                    break;
-                }
+    // Método para regresar la consola al modo normal (cooked)
+    public void unsetRaw() {
+        try {
+            Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "stty echo cooked </dev/tty"}).waitFor();
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Error al regresar al modo normal: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
+    // Método para leer la entrada del usuario y actualizar el modelo
+    public void run() throws IOException {
+        setRaw(); // Pasar la consola a modo raw
+
+        try {
+            int key;
+            while ((key = readKey()) != 13) { // Mientras no se presione Enter
                 switch (key) {
                     case -102: // Flecha derecha
                         model.moveCursorRight();
                         break;
+
                     case -103: // Flecha izquierda
                         model.moveCursorLeft();
                         break;
+
                     case -104: // Home
                         model.moveCursorHome();
                         break;
+
                     case -105: // End
                         model.moveCursorEnd();
                         break;
+
                     case -106: // Backspace
-                        model.deleteChar();
+                        model.deleteCharBeforeCursor();
                         break;
+
                     case -107: // Delete
-                        model.deleteCurrentChar();
+                        model.deleteCharAtCursor();
                         break;
-                    case -108: // Insert (cambia entre modo inserción/sobreescritura)
+
+                    case -108: // Insert
                         model.toggleInsertMode();
-                        view.displayInsertMode(model.isInsertMode());
+                        view.showInsertMode(model.isInsertMode());
                         break;
+
                     default: // Cualquier otro carácter
-                        model.insertChar((char) key);
+                        if (model.isInsertMode()) {
+                            model.insertChar((char) key);
+                        } else {
+                            model.overwriteChar((char) key);
+                        }
                         break;
                 }
+
+                // Actualizar la vista con el texto actual y la posición del cursor
+                view.displayText(model.getText(), model.getCursorPos());
             }
         } finally {
-            reader.unsetRaw();
+            unsetRaw(); // Regresar la consola al modo normal
         }
+    }
+
+    // Método que lee una tecla del usuario
+    public int readKey() throws IOException {
+        int c = reader.read(); // Lee el primer carácter
+
+        if (c == 27) { // Si se detecta ESC
+            reader.read(); // Lee y descarta '['
+            int arrowKey = reader.read();
+            switch (arrowKey) {
+                case 'C': return -102; // Flecha derecha
+                case 'D': return -103; // Flecha izquierda
+                case 'H': return -104; // Home (Inicio de línea)
+                case 'F': return -105; // End (Final de línea)
+                case '2':
+                    int tilde = reader.read();
+                    if (tilde == '~') return -108; // Insert
+                    break;
+                case '3':
+                    int tilde2 = reader.read();
+                    if (tilde2 == '~') return -107; // Delete
+                    break;
+            }
+        } else if (c == 127) {
+            return -106; // Backspace
+        }
+
+        return c; // Retorna el carácter normal si no es una tecla especial
     }
 }
