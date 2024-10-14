@@ -1,17 +1,19 @@
-package MVC;
-
 public class TextView {
     public void displayText(String text, int cursorPos) {
-        System.out.print("\r" + text + " "); // Imprime el buffer con un espacio para borrar restos
-        System.out.print("\r" + text); // Re-imprime el texto
-        moveCursor(cursorPos); // Mueve el cursor a la posición correcta
+        // Limpiar la consola y mostrar el texto
+        System.out.print("\r" + text + " ");
+        
+        // Mover el cursor a la posición correcta
+        System.out.print("\r" + text);
+        moveCursor(cursorPos);
+    }
+
+    public void showInsertMode(boolean isInsertMode) {
+        System.out.println("\nModo de inserción: " + (isInsertMode ? "Activado" : "Desactivado"));
     }
 
     private void moveCursor(int position) {
+        // Esto mueve el cursor hacia la derecha usando escape sequences
         System.out.print("\033[" + (position + 1) + "G"); // Mueve el cursor a la posición dada
-    }
-
-    public void displayInsertMode(boolean insertMode) {
-        System.out.println("\nModo de inserción: " + (insertMode ? "Activado" : "Desactivado"));
     }
 }
