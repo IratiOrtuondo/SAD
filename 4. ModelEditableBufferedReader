@@ -1,64 +1,16 @@
-package MVC;
-
 public class TextModel {
-    private StringBuilder buffer;
+    private StringBuilder text;
     private int cursorPos;
     private boolean insertMode;
 
     public TextModel() {
-        buffer = new StringBuilder();
-        cursorPos = 0;
-        insertMode = true;
-    }
-
-    public void insertChar(char c) {
-        if (insertMode) {
-            buffer.insert(cursorPos, c);
-        } else {
-            if (cursorPos < buffer.length()) {
-                buffer.setCharAt(cursorPos, c);
-            } else {
-                buffer.insert(cursorPos, c);
-            }
-        }
-        cursorPos++;
-    }
-
-    public void deleteChar() {
-        if (cursorPos > 0) {
-            buffer.deleteCharAt(cursorPos - 1);
-            cursorPos--;
-        }
-    }
-
-    public void deleteCurrentChar() {
-        if (cursorPos < buffer.length()) {
-            buffer.deleteCharAt(cursorPos);
-        }
-    }
-
-    public void moveCursorLeft() {
-        if (cursorPos > 0) cursorPos--;
-    }
-
-    public void moveCursorRight() {
-        if (cursorPos < buffer.length()) cursorPos++;
-    }
-
-    public void moveCursorHome() {
-        cursorPos = 0;
-    }
-
-    public void moveCursorEnd() {
-        cursorPos = buffer.length();
-    }
-
-    public void toggleInsertMode() {
-        insertMode = !insertMode;
+        this.text = new StringBuilder();
+        this.cursorPos = 0;
+        this.insertMode = true;  // Modo inserción por defecto
     }
 
     public String getText() {
-        return buffer.toString();
+        return text.toString();
     }
 
     public int getCursorPos() {
@@ -67,5 +19,56 @@ public class TextModel {
 
     public boolean isInsertMode() {
         return insertMode;
+    }
+
+    public void toggleInsertMode() {
+        insertMode = !insertMode;
+    }
+
+    public void insertChar(char c) {
+        text.insert(cursorPos, c);
+        cursorPos++;
+    }
+
+    public void overwriteChar(char c) {
+        if (cursorPos < text.length()) {
+            text.setCharAt(cursorPos, c);
+        } else {
+            text.insert(cursorPos, c);
+        }
+        cursorPos++;
+    }
+
+    public void deleteCharBeforeCursor() {
+        if (cursorPos > 0) {
+            text.deleteCharAt(cursorPos - 1);
+            cursorPos--;
+        }
+    }
+
+    public void deleteCharAtCursor() {
+        if (cursorPos < text.length()) {
+            text.deleteCharAt(cursorPos);
+        }
+    }
+
+    public void moveCursorRight() {
+        if (cursorPos < text.length()) {
+            cursorPos++;
+        }
+    }
+
+    public void moveCursorLeft() {
+        if (cursorPos > 0) {
+            cursorPos--;
+        }
+    }
+
+    public void moveCursorHome() {
+        cursorPos = 0;
+    }
+
+    public void moveCursorEnd() {
+        cursorPos = text.length();
     }
 }
