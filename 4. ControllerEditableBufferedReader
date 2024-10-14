@@ -114,4 +114,12 @@ public class TextController {
 
         return c; // Retorna el carácter normal si no es una tecla especial
     }
+public static void main(String[] args) throws IOException {
+        TextModel model = new TextModel();
+        TextView view = new TextView();
+        TextController controller = new TextController(model, view);
+
+        controller.run(); // Ejecutar el controlador
+    }
+
 }
